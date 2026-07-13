@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Task Manager</title>
+<style>
+  :root {
+    --bg: #eef0f9;
+    --card: #ffffff;
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --text: #1f2333;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --health: #10b981;
+    --health-dark: #059669;
+    --radius: 16px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(160deg, #eef0f9 0%, #e6e9fb 100%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 12px 48px;
+  }
+
+  main {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 4px 0 0;
+    text-align: center;
+  }
+
+  .card {
+    background: var(--card);
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(31, 35, 51, 0.08);
+  }
+
+  .health-card {
+    background: linear-gradient(135deg, var(--health) 0%, var(--health-dark) 100%);
+    color: #fff;
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+  }
+
+  .health-card .label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+
+  .health-card p {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 10px 0 14px;
+  }
+
+  .health-card button {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 40px;
+  }
+
+  .health-card button:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  form {
+    display: flex;
+    gap: 8px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 15px;
+    min-height: 44px;
+  }
+
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+
+  button {
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 44px;
+    transition: background 0.15s ease, transform 0.05s ease;
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+
+  #add-form button {
+    background: var(--primary);
+    color: #fff;
+    padding: 0 18px;
+  }
+
+  #add-form button:hover {
+    background: var(--primary-dark);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f8f9fd;
+  }
+
+  li input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  li span {
+    flex: 1;
+    font-size: 15px;
+    word-break: break-word;
+  }
+
+  li.done {
+    background: #f2f4f7;
+  }
+
+  li.done span {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .delete-btn {
+    background: transparent;
+    color: var(--danger);
+    padding: 6px 10px;
+    min-height: 36px;
+    font-size: 13px;
+  }
+
+  .delete-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-dark);
+  }
+
+  .empty {
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 12px 0;
+  }
+
+  .error {
+    color: var(--danger-dark);
+    font-size: 13px;
+    background: rgba(239, 68, 68, 0.08);
+    padding: 8px 12px;
+    border-radius: 10px;
+  }
+
+  @media (max-width: 380px) {
+    h1 {
+      font-size: 20px;
+    }
+    .card, .health-card {
+      padding: 16px;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: linear-gradient(160deg, #14161f 0%, #1b1e2b 100%);
+      color: #e5e7eb;
+    }
+    .card {
+      background: #1f2333;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    }
+    input[type="text"] {
+      background: #171a26;
+      border-color: #2c3044;
+      color: #e5e7eb;
+    }
+    li {
+      background: #171a26;
+    }
+    li.done {
+      background: #1a1d29;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <h1>Task Manager</h1>
+
+  <section class="health-card">
+    <div class="label">🌱 Task of the day</div>
+    <p id="health-task-text">Loading a healthy suggestion...</p>
+    <button id="health-refresh-btn" type="button">New suggestion</button>
+  </section>
+
+  <section class="card">
+    <form id="add-form">
+      <input type="text" id="title-input" placeholder="New task..." required>
+      <button type="submit">Add</button>
+    </form>
+  </section>
+
+  <p id="error" class="error" style="display:none;"></p>
+
+  <section class="card">
+    <ul id="task-list"></ul>
+  </section>
+</main>
+
+<script>
+  const taskList = document.getElementById('task-list');
+  const addForm = document.getElementById('add-form');
+  const titleInput = document.getElementById('title-input');
+  const errorEl = document.getElementById('error');
+  const healthTaskText = document.getElementById('health-task-text');
+  const healthRefreshBtn = document.getElementById('health-refresh-btn');
+
+  function showError(message) {
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+  }
+
+  function clearError() {
+    errorEl.style.display = 'none';
+  }
+
+  async function fetchTasks() {
+    const res = await fetch('/api/tasks');
+    return res.json();
+  }
+
+  function renderTasks(tasks) {
+    taskList.innerHTML = '';
+    if (tasks.length === 0) {
+      taskList.innerHTML = '<p class="empty">No tasks yet.</p>';
+      return;
+    }
+    for (const task of tasks) {
+      const li = document.createElement('li');
+      if (task.done) li.classList.add('done');
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
+      checkbox.disabled = task.done;
+      checkbox.addEventListener('change', () => completeTask(task.id));
+
+      const span = document.createElement('span');
+      span.textContent = task.title;
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      li.appendChild(deleteBtn);
+      taskList.appendChild(li);
+    }
+  }
+
+  async function refresh() {
+    const tasks = await fetchTasks();
+    renderTasks(tasks);
+  }
+
+  async function addTask(title) {
+    const res = await fetch('/api/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title })
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      showError(data.error || 'Failed to add task.');
+      return;
+    }
+    clearError();
+    await refresh();
+  }
+
+  async function completeTask(id) {
+    const res = await fetch(`/api/tasks/${id}/complete`, { method: 'POST' });
+    if (!res.ok) {
+      showError('Failed to complete task.');
+      return;
+    }
+    clearError();
+    await refresh();
+  }
+
+  async function deleteTask(id) {
+    const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+      showError('Failed to delete task.');
+      return;
+    }
+    clearError();
+    await refresh();
+  }
+
+  async function loadHealthTask() {
+    healthTaskText.textContent = 'Loading a healthy suggestion...';
+    try {
+      const res = await fetch('/api/health-task');
+      const data = await res.json();
+      healthTaskText.textContent = data.task;
+    } catch (e) {
+      healthTaskText.textContent = 'Could not load a suggestion right now.';
+    }
+  }
+
+  addForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = titleInput.value.trim();
+    if (!title) return;
+    await addTask(title);
+    titleInput.value = '';
+  });
+
+  healthRefreshBtn.addEventListener('click', loadHealthTask);
+
+  refresh();
+  loadHealthTask();
+</script>
+
+</body>
+</html>
